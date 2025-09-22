@@ -1,0 +1,7 @@
+# Dockerfile.jira
+FROM atlassian/jira-software:latest
+LABEL authors="bmspill"
+
+# Example: Add a plugin or config
+#COPY my-plugin.jar /opt/atlassian/jira/plugins/
+#COPY jira-config.xml /opt/atlassian/jira/conf/

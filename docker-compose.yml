@@ -1,0 +1,41 @@
+services:
+  jira-site-a:
+    image: atlassian/jira-software
+    ports:
+      - "8080:8080"
+    networks:
+      - atlassian-net
+
+  confluence-site-a:
+    image: atlassian/confluence
+    ports:
+      - "8090:8090"
+    networks:
+      - atlassian-net
+
+  jira-site-b:
+    image: atlassian/jira-software
+    ports:
+      - "8081:8080"
+    networks:
+      - atlassian-net
+
+  confluence-site-b:
+    image: atlassian/confluence
+    ports:
+      - "8091:8090"
+    networks:
+      - atlassian-net
+  neo4j:
+    image: neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=neo4j/test
+    networks:
+      - atlassian-net
+
+networks:
+  atlassian-net:
+    driver: bridge
