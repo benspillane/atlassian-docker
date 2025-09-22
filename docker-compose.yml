@@ -1,38 +1,118 @@
 services:
+
+  jira-db-a:
+    image: postgres
+    container_name: jira-db-a
+    environment:
+      - POSTGRES_DB=jira
+      - POSTGRES_USER=jira
+      - POSTGRES_PASSWORD=jirapassword
+    volumes:
+      - ./jira-db-a:/var/lib/postgresql/data
+    networks:
+      - atlassian-net
+
+  jira-db-b:
+    image: postgres
+    container_name: jira-db-b
+    environment:
+      - POSTGRES_DB=jira
+      - POSTGRES_USER=jira
+      - POSTGRES_PASSWORD=jirapassword
+    volumes:
+      - ./jira-db-b:/var/lib/postgresql/data
+    networks:
+      - atlassian-net
+
+
+  confluence-db-a:
+    image: postgres
+    container_name: confluence-db-a
+    environment:
+      - POSTGRES_DB=confluence
+      - POSTGRES_USER=confluence
+      - POSTGRES_PASSWORD=confluence
+      - POSTGRES_ENCODING=UNICODE
+    volumes:
+      - ./confluence-db-a:/var/lib/postgresql/data
+    networks:
+      - atlassian-net
+
+  confluence-db-b:
+    image: postgres
+    container_name: confluence-db-b
+    environment:
+      - POSTGRES_DB=confluence
+      - POSTGRES_USER=confluence
+      - POSTGRES_PASSWORD=confluence
+      - POSTGRES_ENCODING=UNICODE
+    volumes:
+      - ./confluence-db-b:/var/lib/postgresql/data
+    networks:
+      - atlassian-net
+
   jira-site-a:
-    image: atlassian/jira-software
+    image: atlassian/jira-software:10.7.4
+    container_name: jira-site-a
+    depends_on: ["jira-db-a"]
+    environment:
+      - ALT_JDBC_URL=jdbc:postgresql://jira-db-a:5432/jira
+      - ALT_JDBC_USERNAME=jira
+      - ALT_JDBC_PASSWORD=jirapassword
+    volumes:
+      - ./transfer:/transfer
     ports:
       - "8080:8080"
     networks:
       - atlassian-net
 
-  confluence-site-a:
-    image: atlassian/confluence
-    ports:
-      - "8090:8090"
-    networks:
-      - atlassian-net
-
   jira-site-b:
     image: atlassian/jira-software
+    container_name: jira-site-b
+    depends_on: ["jira-db-b"]
+    environment:
+      - ALT_JDBC_URL=jdbc:postgresql://jira-db-b:5432/jira
+      - ALT_JDBC_USERNAME=jira
+      - ALT_JDBC_PASSWORD=jirapassword
     ports:
       - "8081:8080"
     networks:
       - atlassian-net
 
+  confluence-site-a:
+    image: atlassian/confluence
+    container_name: confluence-site-a
+    environment:
+      - ALT_JDBC_URL=jdbc:postgresql://confluence-db-a:5432/confluence
+      - ALT_JDBC_USERNAME=confluence
+      - ALT_JDBC_PASSWORD=confluence
+    depends_on:
+      - confluence-db-a
+    ports:
+      - "8090:8090"
+    networks:
+      - atlassian-net
+
   confluence-site-b:
     image: atlassian/confluence
+    container_name: confluence-site-b
+    depends_on: ["confluence-db-b"]
+    environment:
+      - ALT_JDBC_URL=jdbc:postgresql://confluence-db-b:5432/confluence
+      - ALT_JDBC_USERNAME=confluence
+      - ALT_JDBC_PASSWORD=confluence
     ports:
       - "8091:8090"
     networks:
       - atlassian-net
-  neo4j:
+  neo4j-a:
     image: neo4j
+    container_name: neo4j-a
     ports:
       - "7474:7474"
       - "7687:7687"
     environment:
-      - NEO4J_AUTH=neo4j/test
+      - NEO4J_AUTH=neo4j/neo4jpwd
     networks:
       - atlassian-net
 
