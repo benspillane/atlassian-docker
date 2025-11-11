@@ -1,7 +1,7 @@
 services:
 
   jira-db-a:
-    image: postgres
+    image: postgres:16.0
     container_name: jira-db-a
     environment:
       - POSTGRES_DB=jira
@@ -11,6 +11,8 @@ services:
       - ./jira-db-a:/var/lib/postgresql/data
     networks:
       - atlassian-net
+    ports:
+      - "5432:5432"
 
   jira-db-b:
     image: postgres
